@@ -1,12 +1,3 @@
-# app.py
-# Video-only Ising (Metropolis) applet with Numba acceleration and pixel-perfect rendering.
-#
-# Install (in your .venv):
-#   python -m pip install numba streamlit numpy
-#   python -m pip install imageio imageio-ffmpeg
-#
-# Run:
-#   python -m streamlit run app.py
 
 import tempfile
 import time
@@ -27,7 +18,6 @@ except Exception:
 
 st.set_page_config(layout="wide")
 
-# Hint: true anti-blur comes from pre-upscaling + fixed-width display (no responsive scaling).
 st.markdown(
     """
     <style>
@@ -38,7 +28,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---- 2-color palette (EXACTLY two colors) ----
 # idx 0 -> spin -1 (dark purple)
 # idx 1 -> spin +1 (dark red)
 PALETTE = np.array(
@@ -152,7 +141,6 @@ def write_mp4_clip_streaming(
     sweeps_between_frames = int(sweeps_between_frames)
     downsample = max(1, int(downsample))
 
-    # Fix pixel geometry for the whole clip
     view_L = int(spins[::downsample, ::downsample].shape[0])
     cell_px = choose_cell_px(view_L, int(target_width_px))
     width_px = view_L * cell_px
@@ -161,7 +149,7 @@ def write_mp4_clip_streaming(
     tmp.close()
     mp4_path = tmp.name
 
-    # Avoid chroma subsampling (reduces “color bleeding” at sharp edges)
+
     ffmpeg_params = [
         "-pix_fmt", "yuv444p",
         "-crf", str(int(crf)),
@@ -260,7 +248,7 @@ if btn_init:
 # ---------- Layout ----------
 left, right = st.columns([4, 1], vertical_alignment="top")
 
-# Always show current state as crisp static image (no blur)
+
 frame_big, L_view, cell_px, width_px = make_frame(
     st.session_state.spins,
     downsample=int(downsample),
@@ -316,7 +304,7 @@ if st.session_state.last_mp4_path is not None:
     right.subheader("Last clip")
     right.video(st.session_state.last_mp4_path)
 
-    # Download button is often useful
+    # Download button 
     mp4_bytes = Path(st.session_state.last_mp4_path).read_bytes()
     right.download_button(
         "Download MP4",
@@ -363,3 +351,4 @@ right.markdown(
 
 if not NUMBA_OK:
     st.warning("Numba not found. Install: python -m pip install numba")
+
